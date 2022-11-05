@@ -71,6 +71,8 @@ def register_order(request):
             address=order_input['address'],
         )
 
+        if isinstance(order_input['products'], list) and not order_input['products']:
+            raise KeyError
         for product in order_input['products']:
             OrderProduct.objects.create(
                 product=Product.objects.get(id=product['product']),
@@ -78,7 +80,14 @@ def register_order(request):
                 count=product['quantity']
 
             )
-
+    except TypeError:
+        return Response({
+            'error': 'products are not list'
+        })
+    except KeyError:
+        return Response({
+            'error': 'no products in request'
+        })
     except ValueError:
         return Response({
             'error': 'something bad',
