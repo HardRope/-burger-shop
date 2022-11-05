@@ -84,7 +84,3 @@ def register_order(request):
             'error': 'something bad',
         })
     return Response({})
-
-
-{'products': [{'product': 6, 'quantity': 1}, {'product': 3, 'quantity': 1}, {'product': 1, 'quantity': 1}],
- 'firstname': 'Вячеслав', 'lastname': 'Волков', 'phonenumber': '89313147092', 'address': 'Дачный Проспект, д. 36к8'}
