@@ -1,4 +1,6 @@
-import json
+from phonenumber_field.phonenumber import PhoneNumber
+from django.core.exceptions import ObjectDoesNotExist
+from django.db import IntegrityError
 from django.http import JsonResponse
 from django.templatetags.static import static
 from rest_framework.decorators import api_view
@@ -63,6 +65,20 @@ def product_list_api(request):
 def register_order(request):
     try:
         order_input = request.data
+        if not isinstance(order_input['firstname'], str):
+            raise ValueError('firstname')
+        if not isinstance(order_input['lastname'], str):
+            raise ValueError('lastname')
+        if not isinstance(order_input['address'], str):
+            raise ValueError('address')
+        if not order_input['phonenumber']:
+            raise KeyError('phonenumber')
+        if isinstance(order_input['products'], list) and not order_input['products']:
+            raise KeyError('products')
+
+        phone = PhoneNumber.from_string(order_input['phonenumber'], region='RU')
+        if not phone.is_valid():
+            raise ValueError('phonenumber')
 
         order = Order.objects.create(
             name=order_input['firstname'],
@@ -71,8 +87,6 @@ def register_order(request):
             address=order_input['address'],
         )
 
-        if isinstance(order_input['products'], list) and not order_input['products']:
-            raise KeyError
         for product in order_input['products']:
             OrderProduct.objects.create(
                 product=Product.objects.get(id=product['product']),
@@ -80,16 +94,24 @@ def register_order(request):
                 count=product['quantity']
 
             )
+    except IntegrityError as integrity:
+        return Response({
+            'error': f'{integrity} error'
+        })
+    except ObjectDoesNotExist as error:
+        return Response({
+            'error': f'{error}'
+        })
     except TypeError:
         return Response({
             'error': 'products are not list'
         })
-    except KeyError:
+    except KeyError as key:
         return Response({
-            'error': 'no products in request'
+            'error': f'missing {key} value'
         })
-    except ValueError:
+    except ValueError as value:
         return Response({
-            'error': 'something bad',
+            'error': f'wrong {value} value',
         })
     return Response({})
