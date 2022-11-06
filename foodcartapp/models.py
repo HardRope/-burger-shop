@@ -153,7 +153,7 @@ class OrderProduct(models.Model):
         related_name='products',
         on_delete=models.CASCADE
     )
-    count = models.IntegerField(
+    quantity = models.IntegerField(
         validators=[MinValueValidator(0),]
     )
 
@@ -162,6 +162,6 @@ class OrderProduct(models.Model):
         verbose_name_plural = 'позиции'
 
     def __str__(self):
-        return f'{self.count} {self.product.name}'
+        return f'{self.quantity} {self.product.name}'
 
 
