@@ -119,11 +119,11 @@ class OrderAdmin(admin.ModelAdmin):
     list_display = [
         'name',
         'lastname',
-        'phone',
+        'phonenumber',
         'address'
     ]
     search_fields = [
-        'phone'
+        'phonenumber'
     ]
     inlines = [
         OrderProductInline
