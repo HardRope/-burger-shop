@@ -4,6 +4,7 @@ from django.templatetags.static import static
 from rest_framework.decorators import api_view
 from rest_framework.decorators import parser_classes
 from rest_framework.parsers import JSONParser
+from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 from rest_framework.serializers import Serializer
 from rest_framework.serializers import CharField, IntegerField
@@ -26,11 +27,13 @@ class OrderProductSerializer(Serializer):
 
 
 class OrderSerializer(ModelSerializer):
-    products = OrderProductSerializer(many=True, allow_empty=False)
+    products = OrderProductSerializer(many=True, allow_empty=False, write_only=True)
+    id = IntegerField(required=False)
 
     class Meta:
         model = Order
         fields = [
+            'id',
             'firstname',
             'lastname',
             'phonenumber',
@@ -98,7 +101,7 @@ def register_order(request):
 
     # TODO починить передачу данных в сериалайзер
     serializer = OrderSerializer(data=order_input)
-    serializer.is_valid(raise_exception=False)
+    serializer.is_valid(raise_exception=True)
 
     # order = Order.objects.create(
     #     firstname=serializer.validated_data['firstname'],
@@ -127,5 +130,5 @@ def register_order(request):
             order=order,
             quantity=product['quantity']
         )
-    return Response({})
+    return Response(OrderSerializer(order).data)
 
