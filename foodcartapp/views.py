@@ -1,12 +1,42 @@
-from phonenumber_field.phonenumber import PhoneNumber
 from django.core.exceptions import ObjectDoesNotExist
-from django.db import IntegrityError
 from django.http import JsonResponse
 from django.templatetags.static import static
 from rest_framework.decorators import api_view
+from rest_framework.decorators import parser_classes
+from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
+from rest_framework.serializers import Serializer
+from rest_framework.serializers import CharField, IntegerField
+from rest_framework.serializers import ModelSerializer, ValidationError
+from django.core.validators import MinValueValidator
 
 from .models import Product, Order, OrderProduct
+
+
+class OrderProductSerializer(Serializer):
+    quantity = IntegerField(validators=[MinValueValidator(0),])
+    product = IntegerField()
+
+    def validate_product(self, value):
+        try:
+            product = Product.objects.get(id=value)
+        except ObjectDoesNotExist:
+            raise ValidationError('Wrong product id')
+        return product
+
+
+class OrderSerializer(ModelSerializer):
+    products = OrderProductSerializer(many=True, allow_empty=False)
+
+    class Meta:
+        model = Order
+        fields = [
+            'firstname',
+            'lastname',
+            'phonenumber',
+            'address',
+            'products'
+        ]
 
 
 def banners_list_api(request):
@@ -62,56 +92,40 @@ def product_list_api(request):
 
 
 @api_view(['POST'])
+@parser_classes([JSONParser])
 def register_order(request):
-    try:
-        order_input = request.data
-        if not isinstance(order_input['firstname'], str):
-            raise ValueError('firstname')
-        if not isinstance(order_input['lastname'], str):
-            raise ValueError('lastname')
-        if not isinstance(order_input['address'], str):
-            raise ValueError('address')
-        if not order_input['phonenumber']:
-            raise KeyError('phonenumber')
-        if isinstance(order_input['products'], list) and not order_input['products']:
-            raise KeyError('products')
+    order_input = request.data
 
-        phone = PhoneNumber.from_string(order_input['phonenumber'], region='RU')
-        if not phone.is_valid():
-            raise ValueError('phonenumber')
+    # TODO починить передачу данных в сериалайзер
+    serializer = OrderSerializer(data=order_input)
+    serializer.is_valid(raise_exception=False)
 
-        order = Order.objects.create(
-            name=order_input['firstname'],
-            lastname=order_input['lastname'],
-            phone=order_input['phonenumber'],
-            address=order_input['address'],
+    # order = Order.objects.create(
+    #     firstname=serializer.validated_data['firstname'],
+    #     lastname=serializer.validated_data['lastname'],
+    #     phonenumber=serializer.validated_data['phonenumber'],
+    #     address=serializer.validated_data['address'],
+    # )
+
+    # order_products_fields = serializer.validated_data['products']
+    # order_products = [OrderProduct(
+    #     order=order,
+    #     quantity=fields['quantity'],
+    #     product=fields['product']) for fields in order_products_fields]
+    # OrderProduct.objects.bulk_create(order_products)
+
+    order = Order.objects.create(
+        firstname=order_input['firstname'],
+        lastname=order_input['lastname'],
+        phonenumber=order_input['phonenumber'],
+        address=order_input['address'],
+    )
+
+    for product in order_input['products']:
+        OrderProduct.objects.create(
+            product=Product.objects.get(id=product['product']),
+            order=order,
+            quantity=product['quantity']
         )
-
-        for product in order_input['products']:
-            OrderProduct.objects.create(
-                product=Product.objects.get(id=product['product']),
-                order=order,
-                count=product['quantity']
-
-            )
-    except IntegrityError as integrity:
-        return Response({
-            'error': f'{integrity} error'
-        })
-    except ObjectDoesNotExist as error:
-        return Response({
-            'error': f'{error}'
-        })
-    except TypeError:
-        return Response({
-            'error': 'products are not list'
-        })
-    except KeyError as key:
-        return Response({
-            'error': f'missing {key} value'
-        })
-    except ValueError as value:
-        return Response({
-            'error': f'wrong {value} value',
-        })
     return Response({})
+
