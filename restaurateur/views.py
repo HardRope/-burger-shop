@@ -2,7 +2,7 @@ from django import forms
 from django.db.models import F, Sum
 from django.shortcuts import redirect, render
 from django.views import View
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from django.contrib.auth.decorators import user_passes_test
 
 from django.contrib.auth import authenticate, login
@@ -103,6 +103,7 @@ def view_orders(request):
             'name': f'{order.firstname} {order.lastname}',
             'phonenumber': order.phonenumber,
             'address': order.address,
+            'url': reverse('admin:foodcartapp_order_change', args=(order.id,))
         }
         order_items.append(order_item)
 
