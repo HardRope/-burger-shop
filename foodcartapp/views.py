@@ -1,15 +1,15 @@
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.validators import MinValueValidator
+from django.db import transaction
 from django.http import JsonResponse
 from django.templatetags.static import static
 from rest_framework.decorators import api_view
 from rest_framework.decorators import parser_classes
 from rest_framework.parsers import JSONParser
-from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 from rest_framework.serializers import Serializer
 from rest_framework.serializers import CharField, IntegerField
 from rest_framework.serializers import ModelSerializer, ValidationError
-from django.core.validators import MinValueValidator
 
 from .models import Product, Order, OrderProduct
 
@@ -96,12 +96,13 @@ def product_list_api(request):
 
 @api_view(['POST'])
 @parser_classes([JSONParser])
+@transaction.atomic
 def register_order(request):
     order_input = request.data
 
     # TODO починить передачу данных в сериалайзер
-    serializer = OrderSerializer(data=order_input)
-    serializer.is_valid(raise_exception=True)
+    # serializer = OrderSerializer(data=order_input)
+    # serializer.is_valid(raise_exception=True)
 
     # order = Order.objects.create(
     #     firstname=serializer.validated_data['firstname'],
@@ -128,7 +129,8 @@ def register_order(request):
         OrderProduct.objects.create(
             product=Product.objects.get(id=product['product']),
             order=order,
-            quantity=product['quantity']
+            quantity=product['quantity'],
+            price_fixed=Product.objects.get(id=product['product']).price
         )
     return Response(OrderSerializer(order).data)
 
