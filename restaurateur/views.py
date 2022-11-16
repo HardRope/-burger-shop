@@ -97,8 +97,11 @@ def view_orders(request):
 
     order_items = []
     for order in orders:
+        if order.status == 'CO':
+            continue
         order_item = {
             'id': order.id,
+            'status': order.get_status_display(),
             'order_cost': order.order_cost,
             'name': f'{order.firstname} {order.lastname}',
             'phonenumber': order.phonenumber,
