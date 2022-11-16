@@ -155,7 +155,9 @@ class Order(models.Model):
         db_index=True,
     )
     address = models.TextField('Адрес')
-
+    comment = models.TextField(
+        blank=True,
+    )
     objects = OrderQuerySet.as_manager()
 
     class Meta:
