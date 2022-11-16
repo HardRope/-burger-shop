@@ -29,7 +29,7 @@
         <td>{{ item.phonenumber }}</td>
         <td>{{ item.address }}</td>
         <td>
-          <a href={{ item.url }} >Редактировать</a>
+          <a href={{ item.url|add:"?next="|add:item.current_url }}>Редактировать</a>
         </td>
       </tr>
     {% endfor %}

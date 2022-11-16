@@ -103,7 +103,8 @@ def view_orders(request):
             'name': f'{order.firstname} {order.lastname}',
             'phonenumber': order.phonenumber,
             'address': order.address,
-            'url': reverse('admin:foodcartapp_order_change', args=(order.id,))
+            'url': reverse('admin:foodcartapp_order_change', args=(order.id,)),
+            'current_url': request.path,
         }
         order_items.append(order_item)
 
