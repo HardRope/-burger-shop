@@ -149,6 +149,20 @@ class Order(models.Model):
         default=RAW,
         db_index=True,
     )
+
+    CASH = 'CS'
+    E_PAY = 'EP'
+    PAYMENT_CHOICES = [
+        (CASH, 'Наличные'),
+        (E_PAY, 'Электронная оплата')
+    ]
+    payment = models.CharField(
+        max_length=2,
+        choices=PAYMENT_CHOICES,
+        null=True,
+        db_index=True,
+    )
+
     firstname = models.CharField('Имя', max_length=20)
     lastname = models.CharField('Фамилия', max_length=20)
     phonenumber = PhoneNumberField(
