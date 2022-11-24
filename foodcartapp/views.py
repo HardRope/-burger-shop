@@ -3,13 +3,11 @@ from django.core.validators import MinValueValidator
 from django.db import transaction
 from django.http import JsonResponse
 from django.templatetags.static import static
-from rest_framework.decorators import api_view
-from rest_framework.decorators import parser_classes
+from rest_framework.decorators import api_view, parser_classes
 from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
-from rest_framework.serializers import Serializer
 from rest_framework.serializers import CharField, IntegerField
-from rest_framework.serializers import ModelSerializer, ValidationError
+from rest_framework.serializers import Serializer, ModelSerializer, ValidationError
 
 from .models import Product, Order, OrderProduct
 
@@ -100,37 +98,22 @@ def product_list_api(request):
 def register_order(request):
     order_input = request.data
 
-    # TODO починить передачу данных в сериалайзер
-    # serializer = OrderSerializer(data=order_input)
-    # serializer.is_valid(raise_exception=True)
-
-    # order = Order.objects.create(
-    #     firstname=serializer.validated_data['firstname'],
-    #     lastname=serializer.validated_data['lastname'],
-    #     phonenumber=serializer.validated_data['phonenumber'],
-    #     address=serializer.validated_data['address'],
-    # )
-
-    # order_products_fields = serializer.validated_data['products']
-    # order_products = [OrderProduct(
-    #     order=order,
-    #     quantity=fields['quantity'],
-    #     product=fields['product']) for fields in order_products_fields]
-    # OrderProduct.objects.bulk_create(order_products)
+    serializer = OrderSerializer(data=order_input)
+    serializer.is_valid(raise_exception=True)
 
     order = Order.objects.create(
-        firstname=order_input['firstname'],
-        lastname=order_input['lastname'],
-        phonenumber=order_input['phonenumber'],
-        address=order_input['address'],
+        firstname=serializer.validated_data['firstname'],
+        lastname=serializer.validated_data['lastname'],
+        phonenumber=serializer.validated_data['phonenumber'],
+        address=serializer.validated_data['address'],
     )
 
-    for product in order_input['products']:
-        OrderProduct.objects.create(
-            product=Product.objects.get(id=product['product']),
-            order=order,
-            quantity=product['quantity'],
-            price_fixed=Product.objects.get(id=product['product']).price
-        )
-    return Response(OrderSerializer(order).data)
+    order_products_fields = serializer.validated_data['products']
+    order_products = [OrderProduct(
+        order=order,
+        quantity=fields['quantity'],
+        product=fields['product'],
+        price_fixed=fields['product'].price) for fields in order_products_fields]
+    OrderProduct.objects.bulk_create(order_products)
 
+    return Response(OrderSerializer(order).data)
