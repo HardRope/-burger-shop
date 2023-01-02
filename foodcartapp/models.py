@@ -174,6 +174,14 @@ class Order(models.Model):
         blank=True,
     )
 
+    restaurant = models.ForeignKey(
+        Restaurant,
+        related_name='restaurant',
+        verbose_name="ресторан",
+        on_delete=models.CASCADE,
+        null=True
+    )
+
     registrated_at = models.DateTimeField('Зарегистрирован', default=timezone.now, db_index=True,)
     called_at = models.DateTimeField('Созвон', blank=True, null=True, db_index=True,)
     delivered_at = models.DateTimeField('Доставлен', blank=True, null=True, db_index=True,)
