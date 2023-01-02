@@ -60,6 +60,16 @@ class LogoutView(auth_views.LogoutView):
     next_page = reverse_lazy('restaurateur:login')
 
 
+def get_restaurants(order):
+    order_products = [order_product.product for order_product in order.products.all()]
+    restaurants = set(Restaurant.objects.all())
+    for product in order_products:
+        product_restaurants = {product_restaurant.restaurant
+                               for product_restaurant in product.menu_items.all() if product_restaurant.availability}
+        restaurants = restaurants.intersection(product_restaurants)
+    return restaurants
+
+
 def is_manager(user):
     return user.is_staff  # FIXME replace with specific permission
 
@@ -99,6 +109,17 @@ def view_orders(request):
     for order in orders:
         if order.status == 'CO':
             continue
+
+        if order.restaurant:
+            restaurant_text = f'Заказ готовится'
+            restaurants = [order.restaurant]
+        elif get_restaurants(order):
+            restaurant_text = f'Заказ может быть выполнен ресторанами:'
+            restaurants = get_restaurants(order)
+        else:
+            restaurant_text = 'Не можем определить ресторан'
+            restaurants = ''
+
         order_item = {
             'id': order.id,
             'status': order.get_status_display(),
@@ -108,6 +129,8 @@ def view_orders(request):
             'phonenumber': order.phonenumber,
             'address': order.address,
             'comment': order.comment,
+            'restaurant_text': restaurant_text,
+            'restaurants': restaurants,
             'url': reverse('admin:foodcartapp_order_change', args=(order.id,)),
             'current_url': request.path,
         }

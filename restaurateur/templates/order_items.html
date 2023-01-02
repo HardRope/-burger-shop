@@ -21,6 +21,7 @@
       <th>Телефон</th>
       <th>Адрес доставки</th>
       <th>Комментарий</th>
+      <th>Рестораны</th>
       <th>Ссылка на админку</th>
     </tr>
 
@@ -33,6 +34,16 @@
         <td>{{ item.name }}</td>
         <td>{{ item.phonenumber }}</td>
         <td>{{ item.address }}</td>
+        <td>
+          <details>
+            <summary>{{ item.restaurant_text }}</summary>
+            <ol>
+            {% for restaurant in item.restaurants %}
+              <li>{{ restaurant.name }}</li>
+            {% endfor %}
+            </ol>
+          </details>
+        </td>
         <td>{{ item.comment }}</td>
         <td>
           <a href={{ item.url|add:"?next="|add:item.current_url }}>Редактировать</a>
