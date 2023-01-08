@@ -12,11 +12,13 @@ class Location(models.Model):
         'Долгота',
         max_digits=22,
         decimal_places=16,
+        null=True
     )
     lat = models.DecimalField(
         'Широта',
         max_digits=22,
         decimal_places=16,
+        null=True
     )
 
     date = models.DateField(
