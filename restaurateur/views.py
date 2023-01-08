@@ -1,4 +1,9 @@
+import requests
+from geopy import distance
+
 from django import forms
+from django.conf import settings
+from django.db import transaction
 from django.db.models import F, Sum
 from django.shortcuts import redirect, render
 from django.views import View
@@ -8,8 +13,8 @@ from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth import authenticate, login
 from django.contrib.auth import views as auth_views
 
-
 from foodcartapp.models import Product, Restaurant, Order
+from locations.models import Location
 
 
 class Login(forms.Form):
@@ -70,6 +75,43 @@ def get_restaurants(order):
     return restaurants
 
 
+def fetch_coordinates(apikey, address):
+    base_url = "https://geocode-maps.yandex.ru/1.x"
+    response = requests.get(base_url, params={
+        "geocode": address,
+        "apikey": apikey,
+        "format": "json",
+    })
+    response.raise_for_status()
+    found_places = response.json()['response']['GeoObjectCollection']['featureMember']
+
+    if not found_places:
+        return None
+
+    most_relevant = found_places[0]
+    lng, lat = most_relevant['GeoObject']['Point']['pos'].split(" ")
+    return lng, lat
+
+
+@transaction.atomic
+def get_location(address):
+    location, location_created = Location.objects.get_or_create(address=address)
+    if location_created:
+        coordinates = fetch_coordinates(settings.YANDEX_API, address)
+        if coordinates:
+            location.lng = coordinates[0]
+            location.lat = coordinates[1]
+            location.save()
+    return location
+
+
+def get_distance(location, restaurant):
+    order_coordinates = (location.lat, location.lng)
+    restaurant_location = get_location(restaurant.address)
+    restaurant_coordinates = (restaurant_location.lat, restaurant_location.lng)
+    return distance.distance(order_coordinates, restaurant_coordinates).km
+
+
 def is_manager(user):
     return user.is_staff  # FIXME replace with specific permission
 
@@ -118,7 +160,19 @@ def view_orders(request):
             restaurants = get_restaurants(order)
         else:
             restaurant_text = 'Не можем определить ресторан'
-            restaurants = ''
+            restaurants = None
+
+        restaurants_distance = []
+        try:
+            location = get_location(order.address)
+            if restaurants:
+                for restaurant in restaurants:
+                    distance = get_distance(location, restaurant)
+                    restaurants_distance.append({'restaurant':restaurant, 'distance': round(distance, 3)})
+        except requests.RequestException:
+            if restaurants:
+                for restaurant in restaurants:
+                    restaurants_distance.append({'restaurant': restaurant, 'distance': 0})
 
         order_item = {
             'id': order.id,
@@ -130,7 +184,7 @@ def view_orders(request):
             'address': order.address,
             'comment': order.comment,
             'restaurant_text': restaurant_text,
-            'restaurants': restaurants,
+            'restaurants': restaurants_distance,
             'url': reverse('admin:foodcartapp_order_change', args=(order.id,)),
             'current_url': request.path,
         }

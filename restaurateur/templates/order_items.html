@@ -35,14 +35,18 @@
         <td>{{ item.phonenumber }}</td>
         <td>{{ item.address }}</td>
         <td>
+          {% if item.restaurants %}
           <details>
             <summary>{{ item.restaurant_text }}</summary>
             <ol>
-            {% for restaurant in item.restaurants %}
-              <li>{{ restaurant.name }}</li>
-            {% endfor %}
+              {% for restaurant in item.restaurants %}
+                <li>{{ restaurant.restaurant.name }} - {{ restaurant.distance }}км</li>
+              {% endfor %}
             </ol>
           </details>
+          {% else %}
+            {{ item.restaurant_text }}
+          {% endif %}
         </td>
         <td>{{ item.comment }}</td>
         <td>
