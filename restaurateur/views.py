@@ -4,8 +4,6 @@ from geopy import distance
 from django import forms
 from django.conf import settings
 from django.db import transaction
-from django.db.models import F, Sum
-from django.db.models import Prefetch
 from django.shortcuts import redirect, render
 from django.views import View
 from django.urls import reverse_lazy, reverse
