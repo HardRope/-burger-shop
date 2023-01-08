@@ -5,6 +5,7 @@ from django import forms
 from django.conf import settings
 from django.db import transaction
 from django.db.models import F, Sum
+from django.db.models import Prefetch
 from django.shortcuts import redirect, render
 from django.views import View
 from django.urls import reverse_lazy, reverse
@@ -65,9 +66,8 @@ class LogoutView(auth_views.LogoutView):
     next_page = reverse_lazy('restaurateur:login')
 
 
-def get_restaurants(order):
+def get_restaurants(order, restaurants):
     order_products = [order_product.product for order_product in order.products.all()]
-    restaurants = set(Restaurant.objects.all())
     for product in order_products:
         product_restaurants = {product_restaurant.restaurant
                                for product_restaurant in product.menu_items.all() if product_restaurant.availability}
@@ -105,9 +105,8 @@ def get_location(address):
     return location
 
 
-def get_distance(location, restaurant):
+def get_distance(location, restaurant_location):
     order_coordinates = (location.lat, location.lng)
-    restaurant_location = get_location(restaurant.address)
     restaurant_coordinates = (restaurant_location.lat, restaurant_location.lng)
     return distance.distance(order_coordinates, restaurant_coordinates).km
 
@@ -145,9 +144,12 @@ def view_restaurants(request):
 
 @user_passes_test(is_manager, login_url='restaurateur:login')
 def view_orders(request):
-    orders = Order.objects.with_price()
+    orders = Order.objects.with_price().prefetch_related('products__product__menu_items__restaurant')
 
     order_items = []
+    available_restaurants = set(Restaurant.objects.all())
+    restaurant_locations = {restaurant.address: get_location(restaurant.address) for restaurant in available_restaurants}
+
     for order in orders:
         if order.status == 'CO':
             continue
@@ -155,9 +157,9 @@ def view_orders(request):
         if order.restaurant:
             restaurant_text = f'Заказ готовится'
             restaurants = [order.restaurant]
-        elif get_restaurants(order):
+        elif get_restaurants(order, available_restaurants):
             restaurant_text = f'Заказ может быть выполнен ресторанами:'
-            restaurants = get_restaurants(order)
+            restaurants = get_restaurants(order, available_restaurants)
         else:
             restaurant_text = 'Не можем определить ресторан'
             restaurants = None
@@ -167,7 +169,7 @@ def view_orders(request):
             location = get_location(order.address)
             if restaurants:
                 for restaurant in restaurants:
-                    distance = get_distance(location, restaurant)
+                    distance = get_distance(location, restaurant_locations[restaurant.address])
                     restaurants_distance.append({'restaurant':restaurant, 'distance': round(distance, 3)})
         except requests.RequestException:
             if restaurants:
