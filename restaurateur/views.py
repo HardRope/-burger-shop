@@ -92,10 +92,10 @@ def fetch_coordinates(apikey, address):
 
 
 @transaction.atomic
-def get_location(address):
+def get_location(address, yandex_api_key):
     location, location_created = Location.objects.get_or_create(address=address)
     if location_created:
-        coordinates = fetch_coordinates(settings.YANDEX_API, address)
+        coordinates = fetch_coordinates(yandex_api_key, address)
         if coordinates:
             location.lng = coordinates[0]
             location.lat = coordinates[1]
@@ -146,7 +146,8 @@ def view_orders(request):
 
     order_items = []
     available_restaurants = set(Restaurant.objects.all())
-    restaurant_locations = {restaurant.address: get_location(restaurant.address) for restaurant in available_restaurants}
+    restaurant_locations = {restaurant.address: get_location(restaurant.address, settings.YANDEX_API_KEY)
+                            for restaurant in available_restaurants}
 
     for order in orders:
         if order.status == 'CO':
@@ -164,7 +165,7 @@ def view_orders(request):
 
         restaurants_distance = []
         try:
-            location = get_location(order.address)
+            location = get_location(order.address, settings.YANDEX_API_KEY)
             if restaurants:
                 for restaurant in restaurants:
                     distance = get_distance(location, restaurant_locations[restaurant.address])
