@@ -210,7 +210,7 @@ class OrderProduct(models.Model):
     )
 
     quantity = models.IntegerField(
-        validators=[MinValueValidator(0),]
+        validators=[MinValueValidator(1),]
     )
 
     fixed_price = models.DecimalField(
