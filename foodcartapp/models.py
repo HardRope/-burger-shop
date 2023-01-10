@@ -143,6 +143,13 @@ class Order(models.Model):
         (COMPLETE, 'Завершен')
     ]
 
+    CASH = 'CS'
+    E_PAY = 'EP'
+    PAYMENT_CHOICES = [
+        (CASH, 'Наличные'),
+        (E_PAY, 'Электронная оплата')
+    ]
+
     status = models.CharField(
         max_length = 2,
         choices=STATUS_CHOICES,
@@ -150,12 +157,6 @@ class Order(models.Model):
         db_index=True,
     )
 
-    CASH = 'CS'
-    E_PAY = 'EP'
-    PAYMENT_CHOICES = [
-        (CASH, 'Наличные'),
-        (E_PAY, 'Электронная оплата')
-    ]
     payment = models.CharField(
         max_length=2,
         choices=PAYMENT_CHOICES,
