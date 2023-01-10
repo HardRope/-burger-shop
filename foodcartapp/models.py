@@ -200,12 +200,13 @@ class OrderProduct(models.Model):
     product = models.ForeignKey(
         Product,
         verbose_name='продукт',
+        related_name='order_products',
         on_delete=models.DO_NOTHING,
     )
     order = models.ForeignKey(
         Order,
         verbose_name='заказ',
-        related_name='products',
+        related_name='order_products',
         on_delete=models.CASCADE
     )
 
