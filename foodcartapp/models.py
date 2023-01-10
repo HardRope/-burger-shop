@@ -174,7 +174,7 @@ class Order(models.Model):
         blank=True,
     )
 
-    restaurant = models.ForeignKey(
+    performing_restaurant = models.ForeignKey(
         Restaurant,
         related_name='restaurant',
         verbose_name="ресторан",

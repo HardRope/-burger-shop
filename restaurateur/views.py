@@ -153,9 +153,9 @@ def view_orders(request):
         if order.status == 'CO':
             continue
 
-        if order.restaurant:
+        if order.performing_restaurant:
             restaurant_text = f'Заказ готовится'
-            restaurants = [order.restaurant]
+            restaurants = [order.performing_restaurant]
         elif get_restaurants(order, available_restaurants):
             restaurant_text = f'Заказ может быть выполнен ресторанами:'
             restaurants = get_restaurants(order, available_restaurants)
