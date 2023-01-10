@@ -169,10 +169,8 @@ class Order(models.Model):
         'Телефон',
         db_index=True,
     )
-    address = models.TextField('Адрес')
-    comment = models.TextField(
-        blank=True,
-    )
+    address = models.CharField('Адрес', max_length=100)
+    comment = models.CharField('Комментарий', blank=True, max_length=200,)
 
     performing_restaurant = models.ForeignKey(
         Restaurant,
