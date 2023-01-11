@@ -64,7 +64,7 @@ class LogoutView(auth_views.LogoutView):
     next_page = reverse_lazy('restaurateur:login')
 
 
-def get_restaurants(order, restaurants):
+def get_possible_restaurants(order, restaurants):
     order_products = [order_product.product for order_product in order.order_products.all()]
     for product in order_products:
         product_restaurants = {product_restaurant.restaurant
@@ -139,9 +139,9 @@ def view_orders(request):
         if order.performing_restaurant:
             restaurant_text = f'Заказ готовится'
             restaurants = [order.performing_restaurant]
-        elif get_restaurants(order, available_restaurants):
+        elif get_possible_restaurants(order, available_restaurants):
             restaurant_text = f'Заказ может быть выполнен ресторанами:'
-            restaurants = get_restaurants(order, available_restaurants)
+            restaurants = get_possible_restaurants(order, available_restaurants)
         else:
             restaurant_text = 'Не можем определить ресторан'
             restaurants = None
