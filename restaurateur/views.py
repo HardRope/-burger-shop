@@ -65,7 +65,7 @@ class LogoutView(auth_views.LogoutView):
 
 
 def get_restaurants(order, restaurants):
-    order_products = [order_product.product for order_product in order.products.all()]
+    order_products = [order_product.product for order_product in order.order_products.all()]
     for product in order_products:
         product_restaurants = {product_restaurant.restaurant
                                for product_restaurant in product.menu_items.all() if product_restaurant.availability}
