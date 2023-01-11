@@ -79,8 +79,9 @@ def get_location(address, yandex_api_key):
     if location_created:
         coordinates = fetch_coordinates(yandex_api_key, address)
         if coordinates:
-            location.lng = coordinates[0]
-            location.lat = coordinates[1]
+            lng, lat = coordinates
+            location.lng = lng
+            location.lat = lat
             location.save()
     return location
 
