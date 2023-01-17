@@ -14,7 +14,7 @@ from django.contrib.auth import views as auth_views
 
 from foodcartapp.models import Product, Restaurant, Order
 from locations.models import Location
-from locations.utils import fetch_coordinates
+from locations.yandex_geocode_api import fetch_coordinates
 
 class Login(forms.Form):
     username = forms.CharField(
