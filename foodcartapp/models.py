@@ -151,6 +151,7 @@ class Order(models.Model):
     ]
 
     status = models.CharField(
+        'статус заказа',
         max_length = 2,
         choices=STATUS_CHOICES,
         default=RAW,
@@ -158,6 +159,7 @@ class Order(models.Model):
     )
 
     payment = models.CharField(
+        'способ оплаты',
         max_length=2,
         choices=PAYMENT_CHOICES,
         null=True,
@@ -210,10 +212,12 @@ class OrderProduct(models.Model):
     )
 
     quantity = models.IntegerField(
+        'количество',
         validators=[MinValueValidator(1),]
     )
 
     fixed_price = models.DecimalField(
+        'фиксированная стоимость',
         max_digits=10,
         decimal_places=2,
         validators=[MinValueValidator(0),]
