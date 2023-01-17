@@ -173,7 +173,7 @@ class Order(models.Model):
         db_index=True,
     )
     address = models.CharField('Адрес', max_length=100)
-    comment = models.CharField('Комментарий', blank=True, max_length=200,)
+    comment = models.TextField('Комментарий', blank=True, max_length=200,)
 
     order_fulfilling_restaurant = models.ForeignKey(
         Restaurant,
