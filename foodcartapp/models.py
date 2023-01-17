@@ -175,7 +175,7 @@ class Order(models.Model):
     address = models.CharField('Адрес', max_length=100)
     comment = models.CharField('Комментарий', blank=True, max_length=200,)
 
-    performing_restaurant = models.ForeignKey(
+    order_fulfilling_restaurant = models.ForeignKey(
         Restaurant,
         related_name='restaurant',
         verbose_name="ресторан",
