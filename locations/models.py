@@ -21,7 +21,7 @@ class Location(models.Model):
         null=True
     )
 
-    date = models.DateField(
+    updated_at = models.DateField(
         'Дата обновления',
         default=timezone.now,
         db_index=True,
