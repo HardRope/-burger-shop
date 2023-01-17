@@ -125,7 +125,7 @@ def view_restaurants(request):
 
 @user_passes_test(is_manager, login_url='restaurateur:login')
 def view_orders(request):
-    orders = Order.objects.with_price().order_by('id').\
+    orders = Order.objects.with_price().exclude(status='CO').order_by('id').\
         prefetch_related('order_products__product__menu_items__restaurant')
 
     order_items = []
@@ -134,9 +134,6 @@ def view_orders(request):
                             for restaurant in available_restaurants}
 
     for order in orders:
-        if order.status == 'CO':
-            continue
-
         if order.performing_restaurant:
             restaurant_text = f'Заказ готовится'
             restaurants = [order.performing_restaurant]
