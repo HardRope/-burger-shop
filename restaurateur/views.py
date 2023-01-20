@@ -1,9 +1,7 @@
 import requests
-from geopy import distance
 
 from django import forms
 from django.conf import settings
-from django.db import transaction
 from django.shortcuts import redirect, render
 from django.views import View
 from django.urls import reverse_lazy, reverse
@@ -13,8 +11,8 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth import views as auth_views
 
 from foodcartapp.models import Product, Restaurant, Order
-from locations.models import Location
-from locations.yandex_geocode_api import fetch_coordinates
+from locations.location_creating import get_location
+from locations.distance_calculation import get_distance
 
 class Login(forms.Form):
     username = forms.CharField(
@@ -71,25 +69,6 @@ def get_possible_restaurants(order, restaurants):
                                for product_restaurant in product.menu_items.all() if product_restaurant.availability}
         restaurants = restaurants.intersection(product_restaurants)
     return restaurants
-
-
-@transaction.atomic
-def get_location(address, yandex_api_key):
-    location, location_created = Location.objects.get_or_create(address=address)
-    if location_created:
-        coordinates = fetch_coordinates(yandex_api_key, address)
-        if coordinates:
-            lng, lat = coordinates
-            location.lng = lng
-            location.lat = lat
-            location.save()
-    return location
-
-
-def get_distance(location, restaurant_location):
-    order_coordinates = location.lat, location.lng
-    restaurant_coordinates = restaurant_location.lat, restaurant_location.lng
-    return distance.distance(order_coordinates, restaurant_coordinates).km
 
 
 def is_manager(user):
