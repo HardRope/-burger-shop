@@ -26,3 +26,6 @@ class Location(models.Model):
         default=timezone.now,
         db_index=True,
     )
+
+    def __str__(self):
+        return self.address
