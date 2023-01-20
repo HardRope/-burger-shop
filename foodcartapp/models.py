@@ -158,7 +158,7 @@ class Order(models.Model):
         db_index=True,
     )
 
-    payment = models.CharField(
+    payment_method = models.CharField(
         'способ оплаты',
         max_length=2,
         choices=PAYMENT_CHOICES,
@@ -173,9 +173,9 @@ class Order(models.Model):
         db_index=True,
     )
     address = models.CharField('Адрес', max_length=100)
-    comment = models.TextField('Комментарий', blank=True, max_length=200,)
+    comment = models.TextField('Комментарий', blank=True)
 
-    order_fulfilling_restaurant = models.ForeignKey(
+    fulfilling_restaurant = models.ForeignKey(
         Restaurant,
         related_name='restaurant',
         verbose_name="ресторан",
