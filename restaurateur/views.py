@@ -11,6 +11,7 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth import views as auth_views
 
 from foodcartapp.models import Product, Restaurant, Order
+from locations.models import Location
 from locations.location_creating import get_location
 from locations.distance_calculation import get_distance
 
@@ -107,10 +108,27 @@ def view_orders(request):
     orders = Order.objects.with_price().exclude(status='CO').order_by('id').\
         prefetch_related('order_products__product__menu_items__restaurant')
 
-    order_items = []
     available_restaurants = set(Restaurant.objects.all())
-    restaurant_locations = {restaurant.address: get_location(restaurant.address, settings.YANDEX_API_KEY)
-                            for restaurant in available_restaurants}
+    restaurant_addresses = [restaurant.address for restaurant in available_restaurants]
+    restaurant_locations = Location.objects.in_bulk(restaurant_addresses, field_name='address')
+
+    for address in restaurant_addresses:
+        if address not in restaurant_locations.keys():
+            try:
+                restaurant_locations[address] = get_location(address, settings.YANDEX_API_KEY)
+            except requests.RequestException:
+                restaurant_locations[address] = None
+
+    order_items = []
+    order_addresses = [order.address for order in orders]
+    order_locations = Location.objects.in_bulk(order_addresses, field_name='address')
+
+    for address in order_addresses:
+        if address not in order_locations.keys():
+            try:
+                order_locations[address] = get_location(address, settings.YANDEX_API_KEY)
+            except requests.RequestException:
+                order_locations[address] = None
 
     for order in orders:
         if order.fulfilling_restaurant:
@@ -124,21 +142,30 @@ def view_orders(request):
             restaurants = None
 
         restaurants_distance = []
-        try:
-            location = get_location(order.address, settings.YANDEX_API_KEY)
-            if restaurants:
-                for restaurant in restaurants:
-                    distance = get_distance(location, restaurant_locations[restaurant.address])
-                    restaurants_distance.append({'restaurant':restaurant, 'distance': round(distance, 3)})
-        except requests.RequestException:
-            if restaurants:
-                for restaurant in restaurants:
-                    restaurants_distance.append({'restaurant': restaurant, 'distance': 0})
+        location = order_locations[order.address]
+
+        if location and restaurants:
+            for restaurant in restaurants:
+                restaurant_location = restaurant_locations.get(restaurant.address)
+                restaurant_address = restaurant.address
+                if restaurant_location:
+                    distance = get_distance(location, restaurant_location)
+                    restaurants_distance.append(
+                        {
+                            'restaurant_address':restaurant_address,
+                            'distance': round(distance, 3)
+                        })
+                else:
+                    restaurants_distance.append(
+                        {
+                            'restaurant_address': restaurant_address,
+                            'distance': 0
+                        })
 
         order_item = {
             'id': order.id,
             'status': order.get_status_display(),
-            'payment': order.get_payment_display(),
+            'payment': order.get_payment_method_display(),
             'order_cost': order.order_cost,
             'name': f'{order.firstname} {order.lastname}',
             'phonenumber': order.phonenumber,

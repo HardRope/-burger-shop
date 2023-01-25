@@ -40,7 +40,7 @@
             <summary>{{ item.restaurant_text }}</summary>
             <ol>
               {% for restaurant in item.restaurants %}
-                <li>{{ restaurant.restaurant.name }} - {{ restaurant.distance }}км</li>
+                <li>{{ restaurant.restaurant_address }} - {{ restaurant.distance }}км</li>
               {% endfor %}
             </ol>
           </details>
