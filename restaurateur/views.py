@@ -148,21 +148,14 @@ def view_orders(request):
             for restaurant in restaurants:
                 restaurant_location = restaurant_locations.get(restaurant.address)
                 restaurant_address = restaurant.address
-                if restaurant_location:
-                    distance = get_distance(location, restaurant_location)
-                    restaurants_distance.append(
-                        {
-                            'restaurant_address':restaurant_address,
-                            'distance': round(distance, 3)
-                        })
-                else:
-                    restaurants_distance.append(
-                        {
-                            'restaurant_address': restaurant_address,
-                            'distance': 0
-                        })
+                distance = get_distance(location, restaurant_location)
+                restaurants_distance.append(
+                    {
+                        'restaurant_address': restaurant_address,
+                        'distance': round(distance, 3)
+                    })
 
-        order_item = {
+        order_collection = {
             'id': order.id,
             'status': order.get_status_display(),
             'payment': order.get_payment_method_display(),
