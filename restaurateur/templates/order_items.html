@@ -25,32 +25,32 @@
       <th>Ссылка на админку</th>
     </tr>
 
-    {% for item in order_items %}
+    {% for order in order_collections %}
       <tr>
-        <td>{{ item.id }}</td>
-        <td>{{ item.status }}</td>
-        <td>{{ item.payment }}</td>
-        <td>{{ item.order_cost }}</td>
-        <td>{{ item.name }}</td>
-        <td>{{ item.phonenumber }}</td>
-        <td>{{ item.address }}</td>
+        <td>{{ order.id }}</td>
+        <td>{{ order.status }}</td>
+        <td>{{ order.payment }}</td>
+        <td>{{ order.order_cost }}</td>
+        <td>{{ order.name }}</td>
+        <td>{{ order.phonenumber }}</td>
+        <td>{{ order.address }}</td>
         <td>
-          {% if item.restaurants %}
+          {% if order.restaurants %}
           <details>
-            <summary>{{ item.restaurant_text }}</summary>
+            <summary>{{ order.restaurant_text }}</summary>
             <ol>
-              {% for restaurant in item.restaurants %}
+              {% for restaurant in order.restaurants %}
                 <li>{{ restaurant.restaurant_address }} - {{ restaurant.distance }}км</li>
               {% endfor %}
             </ol>
           </details>
           {% else %}
-            {{ item.restaurant_text }}
+            {{ order.restaurant_text }}
           {% endif %}
         </td>
-        <td>{{ item.comment }}</td>
+        <td>{{ order.comment }}</td>
         <td>
-          <a href={{ item.url|add:"?next="|add:item.current_url }}>Редактировать</a>
+          <a href={{ order.url|add:"?next="|add:order.current_url }}>Редактировать</a>
         </td>
       </tr>
     {% endfor %}
