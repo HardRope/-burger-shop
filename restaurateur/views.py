@@ -176,8 +176,8 @@ def view_orders(request):
             'url': reverse('admin:foodcartapp_order_change', args=(order.id,)),
             'current_url': request.path,
         }
-        order_items.append(order_item)
+        order_collections.append(order_collection)
 
     return render(request, template_name='order_items.html', context={
-        'order_items': order_items,
+        'order_collections': order_collections,
     })
