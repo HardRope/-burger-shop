@@ -1,6 +1,8 @@
 from geopy import distance
 
-def get_distance(location, restaurant_location):
-    order_coordinates = location.lat, location.lng
-    restaurant_coordinates = restaurant_location.lat, restaurant_location.lng
-    return distance.distance(order_coordinates, restaurant_coordinates).km
+def get_distance(first_location, second_location):
+    if not all([first_location, second_location]):
+        return 0
+    first_coordinates = first_location.lat, first_location.lng
+    second_coordinates = second_location.lat, second_location.lng
+    return distance.distance(first_coordinates, second_coordinates).km
