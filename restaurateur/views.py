@@ -155,7 +155,11 @@ def view_orders(request):
             for restaurant in restaurants:
                 restaurant_location = restaurant_locations.get(restaurant.address)
                 restaurant_address = restaurant.address
-                distance = get_distance(location, restaurant_location)
+
+                distance = 0
+                if restaurant_location:
+                    distance = get_distance(location, restaurant_location)
+
                 restaurants_distance.append(
                     {
                         'restaurant_address': restaurant_address,
