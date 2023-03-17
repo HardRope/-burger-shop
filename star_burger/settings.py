@@ -107,7 +107,6 @@ DATABASES = {
     'default': dj_database_url.parse(
         env('POSTGRES_URL'),
         conn_max_age=600,
-        conn_health_checks=True,
     )
 }
 
