@@ -8,9 +8,6 @@ git pull -q
 echo -e "Update repository -- ${GRN}OK${DEF}"
 $PYENV_ROOT/versions/starburger/bin/pip install -r requirements.txt -q
 echo -e "Update requirements -- ${GRN}OK${DEF}"
-apt-get -yqq install nodejs
-apt-get -yqq install npm
-echo -e "Update nodejs -- ${GRN}OK${DEF}"
 npm ci --dev --silent
 ./node_modules/.bin/parcel build bundles-src/index.js --dist-dir bundles --public-url="./" --log-level warn
 echo -e "Rebuild frontend -- ${GRN}OK${DEF}"
