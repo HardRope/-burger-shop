@@ -40,7 +40,7 @@ REST_FRAMEWORK = {
 }
 
 ROLLBAR = {
-    'access_token': env('ROLLBAR_TOKEN'),
+    'access_token': env('ROLLBAR_TOKEN', None),
     'environment': 'development' if env('ROLLBAR_DEBUG', True) else env('ROLLBAR_ENVIRONMENT', 'production'),
     'code_version': '1.0',
     'branch': 'master',
