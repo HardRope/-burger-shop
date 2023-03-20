@@ -13,7 +13,7 @@ npm ci --dev --silent
 echo -e "Rebuild frontend -- ${GRN}OK${DEF}"
 $PYENV_ROOT/versions/starburger/bin/python manage.py collectstatic --noinput --verbosity=0
 echo -e "Collect staticfiles -- ${GRN}OK${DEF}"
-$PYENV_ROOT/versions/starburger/bin/python manage.py migrate --verbosity=0
+$PYENV_ROOT/versions/starburger/bin/python manage.py migrate --noinput --verbosity=0
 echo -e "Accept migrations -- ${GRN}OK${DEF}"
 systemctl reload nginx
 echo -e "Reload nginx -- ${GRN}OK${DEF}"
