@@ -39,18 +39,6 @@ REST_FRAMEWORK = {
     ]
 }
 
-ROLLBAR = {
-    'access_token': env('ROLLBAR_TOKEN', None),
-    'environment': 'development' if env('ROLLBAR_DEBUG', True) else env('ROLLBAR_ENVIRONMENT', 'production'),
-    'code_version': '1.0',
-    'branch': 'master',
-    'root': BASE_DIR,
-    'ignorable_404_urls': (
-        re.compile('/index\.php'),
-        re.compile('/manager/'),
-    ),
-}
-
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -60,7 +48,6 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
-    'rollbar.contrib.django.middleware.RollbarNotifierMiddleware',
 ]
 
 ROOT_URLCONF = 'star_burger.urls'
@@ -148,3 +135,18 @@ STATICFILES_DIRS = [
 ]
 
 YANDEX_API_KEY = env('YANDEX_API_KEY')
+
+if env('ROLLBAR_ENABLE', False):
+    MIDDLEWARE.append('rollbar.contrib.django.middleware.RollbarNotifierMiddleware')
+
+ROLLBAR = {
+    'access_token': env('ROLLBAR_TOKEN', None),
+    'environment': env('ROLLBAR_ENVIRONMENT', 'development'),
+    'code_version': '1.0',
+    'branch': 'master',
+    'root': BASE_DIR,
+    'ignorable_404_urls': (
+        re.compile('/index\.php'),
+        re.compile('/manager/'),
+    ),
+}

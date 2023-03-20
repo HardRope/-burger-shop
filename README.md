@@ -65,10 +65,13 @@ SECRET_KEY=django-insecure-0if40nf4nf93n4
 YANDEX_API_KEY=504b0...
 ```
 
-К сайту подключена система логгирования [Rollbar](https://rollbar.com/). Вам потребуется получить токен и так же добавить его в `.env
+К сайту подключена система логгирования [Rollbar](https://rollbar.com/). Для использования
+Вам потребуется получить токен и так же добавить его в `.env`. Опционально.
 
 ```
-ROLLBAR_TOKEN=your_rollbar_token
+ROLLBAR_ENABLE = True     # Для включения роллбара
+ROLLBAR_TOKEN= your_rollbar_token    # Токен rollbar-project'а
+ROLLBAR_ENVIRONMENT= environment_name (default: 'development)  #Название окружения для получения ошибок в роллбаре
 ```
 
 Создайте файл базы данных SQLite и отмигрируйте её следующей командой:
@@ -161,9 +164,11 @@ Parcel будет следить за файлами в каталоге `bundle
 - `ALLOWED_HOSTS` — список разрешённых доменных имён для вашего сайта. Подробнее о настройке написано в
 [документации Django](https://docs.djangoproject.com/en/3.1/ref/settings/#allowed-hosts)
 - `YANDEX_API_KEY` —  ключ взаимодействия с АПИ Яндекса для получения координат адресов. [API Яндекса](https://developer.tech.yandex.ru/services/)
+
+Опционально:
+- `ROLLBAR_ENABLE` — Включение Роллбара. Укажите `True` для включения
 - `ROLLBAR_TOKEN` — токен взаимодействия с [Rollbar](https://rollbar.com/).
-- `ROLLBAR_DEBUG` — дебаг-режим Роллбара. Укажите `False`
-- `ROLLBAR_ENVIRONMENT` — имя окружения для упрощения поиска логов. Значение по умолчанию: `production`
+- `ROLLBAR_ENVIRONMENT` — имя окружения для упрощения поиска логов. Значение по умолчанию: `development`
 
 ## Деплой
 
