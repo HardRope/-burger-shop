@@ -19,7 +19,7 @@ systemctl reload nginx
 echo -e "Reload nginx -- ${GRN}OK${DEF}"
 
 GIT_SHA=$(git rev-parse HEAD)
-curl --request POST \
+curl -s --request POST \
      --url https://api.rollbar.com/api/1/deploy \
      --header "X-Rollbar-Access-Token: ${ROLLBAR_TOKEN}" \
      --header 'accept: application/json' \
