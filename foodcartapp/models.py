@@ -132,7 +132,7 @@ class OrderQuerySet(models.QuerySet):
 
 
 class Order(models.Model):
-    RAW='RW'
+    RAW = 'RW'
     PROCESSED = 'PR'
     DELIVERY = 'DE'
     COMPLETE = 'CO'
@@ -152,7 +152,7 @@ class Order(models.Model):
 
     status = models.CharField(
         'статус заказа',
-        max_length = 2,
+        max_length=2,
         choices=STATUS_CHOICES,
         default=RAW,
         db_index=True,
@@ -183,9 +183,12 @@ class Order(models.Model):
         null=True
     )
 
-    registrated_at = models.DateTimeField('Зарегистрирован', default=timezone.now, db_index=True,)
-    called_at = models.DateTimeField('Созвон', blank=True, null=True, db_index=True,)
-    delivered_at = models.DateTimeField('Доставлен', blank=True, null=True, db_index=True,)
+    registrated_at = models.DateTimeField(
+        'Зарегистрирован', default=timezone.now, db_index=True,)
+    called_at = models.DateTimeField(
+        'Созвон', blank=True, null=True, db_index=True,)
+    delivered_at = models.DateTimeField(
+        'Доставлен', blank=True, null=True, db_index=True,)
 
     objects = OrderQuerySet.as_manager()
 
@@ -213,14 +216,14 @@ class OrderProduct(models.Model):
 
     quantity = models.IntegerField(
         'количество',
-        validators=[MinValueValidator(1),]
+        validators=[MinValueValidator(1), ]
     )
 
     fixed_price = models.DecimalField(
         'фиксированная стоимость',
         max_digits=10,
         decimal_places=2,
-        validators=[MinValueValidator(0),]
+        validators=[MinValueValidator(0), ]
     )
 
     class Meta:
@@ -229,5 +232,3 @@ class OrderProduct(models.Model):
 
     def __str__(self):
         return f'{self.quantity} {self.product.name}'
-
-
