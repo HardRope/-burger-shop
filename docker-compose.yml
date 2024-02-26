@@ -58,4 +58,3 @@ volumes:
   static:
   media:
   postgres_data:
-  nginx:
