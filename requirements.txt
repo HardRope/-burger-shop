@@ -7,7 +7,8 @@ djangorestframework==3.14.0
 environs==9.3.2
 geopy==2.3.0
 phonenumbers==8.12.57
-Pillow==8.2.0
+Pillow
 requests==2.28.1
 rollbar==0.16.3
 psycopg2-binary==2.9.5
+gunicorn==21.2.0
