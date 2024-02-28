@@ -9,7 +9,7 @@ echo -e "Update repository -- ${GRN}OK${DEF}"
 $PYENV_ROOT/versions/starburger/bin/pip install -r requirements.txt -q
 echo -e "Update requirements -- ${GRN}OK${DEF}"
 npm ci --dev --silent
-./node_modules/.bin/parcel build bundles-src/index.js --dist-dir bundles --public-url="./" --log-level warn
+./node_modules/.bin/parcel build /frontend/bundles-src/index.js --dist-dir /backend/bundles --public-url="./" --log-level warn
 echo -e "Rebuild frontend -- ${GRN}OK${DEF}"
 $PYENV_ROOT/versions/starburger/bin/python manage.py collectstatic --noinput --verbosity=0
 echo -e "Collect staticfiles -- ${GRN}OK${DEF}"
